@@ -1,0 +1,19 @@
+# Large data and model files
+*.h5ad
+*.ckpt
+insilico_perturbation_pipeline/data/test_perturbation_csvs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store

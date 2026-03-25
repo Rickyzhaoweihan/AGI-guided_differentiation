@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/models/checkpoints)",
+      "Bash(mkdir -p /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/configs)",
+      "Bash(mkdir -p /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/data)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/fetal_heart_insilico_perturbation/configs/starter.toml /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/configs/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/fetal_heart_insilico_perturbation/configs/full_dataset.toml /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/configs/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/fetal_heart_insilico_perturbation/scripts/create_esm_pert_features.py /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/scripts/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/fetal_heart_insilico_perturbation/scripts/run_insilico_perturbation.py /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/scripts/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/fetal_heart_insilico_perturbation/scripts/train_state_model.py /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/scripts/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/competition_support_set/competition_support_set/ESM2_pert_features.pt /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/models/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/competition_support_set/competition_support_set/gene_names.csv /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/models/)",
+      "Bash(cp /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/competition_support_set/competition_support_set/starter.toml /nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/models/)",
+      "Bash(python3:*)",
+      "Bash(conda run:*)"
+    ]
+  }
+}

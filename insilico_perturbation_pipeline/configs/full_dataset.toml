@@ -1,0 +1,30 @@
+# Configuration for training STATE model on full Replogle-Nadig dataset
+#
+# This config uses all cells from filtered datasets (~800K cells)
+# for production-quality training.
+#
+# Cell counts per dataset:
+#   - hepg2_full:  ~96,616 cells
+#   - jurkat_full: ~184,470 cells
+#   - k562_full:   ~188,590 cells
+#   - rpe1_full:   ~173,737 cells
+#   - competition_train: H1 cells
+#
+# Usage:
+#   python scripts/train_state_model.py --config configs/full_dataset.toml
+
+# Dataset paths - maps dataset names to their directories
+# Update the path below to point to your data location
+[datasets]
+replogle_full = "/path/to/data/competition_support_set/{competition_train,k562_gwps,rpe1_full,jurkat_full,k562_full,hepg2_full}.h5"
+
+# Training specifications
+[training]
+replogle_full = "train"
+
+# Zeroshot specifications - entire cell types go to val or test
+[zeroshot]
+"replogle_full.hepg2" = "test"
+
+# Fewshot specifications - explicit perturbation lists
+[fewshot]
