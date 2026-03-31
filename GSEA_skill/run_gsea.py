@@ -84,7 +84,7 @@ def run_gsea_preranked(ranked_genes, gene_sets, output_dir, label):
     """Run gseapy prerank GSEA and save results."""
     import gseapy as gp
 
-    rnk = ranked_genes["log_diff"]
+    rnk = ranked_genes["log2fc"]
 
     out = Path(output_dir) / f"gsea_{gene_sets}"
     out.mkdir(parents=True, exist_ok=True)

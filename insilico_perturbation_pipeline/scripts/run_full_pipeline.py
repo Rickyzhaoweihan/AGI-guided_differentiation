@@ -249,17 +249,18 @@ def submit(cfg, dry_run=False):
     # Skip jobs that already have predictions
     pending = []
     for job in jobs:
-        # Infer prediction path from job name
-        parts = job.stem.rsplit("_", 1)  # e.g., adult_gut_eecs_batch000
-        # Check if predictions exist by looking for the prediction file
-        # Parse the script to find the prediction output path
+        # Parse the SLURM script to find the prediction output path
         content = job.read_text()
-        pred_line = [l for l in content.splitlines() if "--output" in l and "predictions_" in l]
-        if pred_line:
-            pred_path = pred_line[0].strip().rstrip(" \\")
-            if os.path.exists(pred_path):
-                print(f"  SKIP {job.stem} (predictions exist)")
-                continue
+        pred_path = None
+        for line in content.splitlines():
+            line_stripped = line.strip().rstrip(" \\")
+            if "predictions_" in line_stripped and line_stripped.endswith(".h5ad"):
+                # This is the --output value on its own line (after line continuation)
+                pred_path = line_stripped
+                break
+        if pred_path and os.path.exists(pred_path):
+            print(f"  SKIP {job.stem} (predictions exist)")
+            continue
         pending.append(job)
 
     total = len(pending)
