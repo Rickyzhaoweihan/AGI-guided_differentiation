@@ -48,54 +48,63 @@ def run_gsea(de_results, gene_sets="MSigDB_Hallmark_2020", output_dir=None,
 def run_ora(de_results, log2fc_threshold=0.5, fdr_threshold=0.05):
     """Run Over-Representation Analysis on significant DE genes using decoupleR.
 
+    Uses the full DE result vector with dc.mt.ora, which internally selects
+    top/bottom features for enrichment testing against the full gene background.
+
     Args:
         de_results: DataFrame from Phase 2 with 'log2fc', 'fdr', 'is_significant'
 
     Returns:
-        dict with 'up' and 'down' ORA results DataFrames
+        dict with 'result' DataFrame from ORA
     """
     import decoupler as dc
-
-    sig = de_results[de_results["is_significant"]]
-    if sig.empty:
-        # Fall back to top genes by effect size if nothing passes FDR
-        sig = de_results.nlargest(100, "log2fc")
+    import anndata as adat
 
     # Get MSigDB Hallmark gene sets
     try:
         msigdb = dc.op.hallmark()
     except Exception:
-        return {"up": pd.DataFrame(), "down": pd.DataFrame(), "error": "Failed to fetch hallmark gene sets"}
+        return {"error": "Failed to fetch hallmark gene sets"}
 
-    # Upregulated genes
-    up_genes = sig[sig["log2fc"] > 0].index.tolist()
-    # Downregulated genes
-    down_genes = sig[sig["log2fc"] < 0].index.tolist()
+    # Pass the full log2fc vector as an AnnData — decoupleR ORA selects
+    # top positive and bottom negative features internally
+    mat = adat.AnnData(
+        X=de_results["log2fc"].values.reshape(1, -1).astype(np.float32),
+        var=pd.DataFrame(index=de_results.index),
+        obs=pd.DataFrame(index=["perturbation"]),
+    )
 
-    results = {}
-    for direction, genes in [("up", up_genes), ("down", down_genes)]:
-        if not genes:
-            results[direction] = pd.DataFrame()
-            continue
+    try:
+        dc.mt.ora(mat, net=msigdb)
+        # Extract results from obsm
+        est_key = next((k for k in mat.obsm if "score" in k and "ora" in k), None)
+        pval_key = next((k for k in mat.obsm if "padj" in k and "ora" in k), None)
 
-        try:
-            ora_res = dc.mt.ora(
-                mat=pd.DataFrame(
-                    np.ones((1, len(genes))),
-                    columns=genes,
-                ),
-                net=msigdb,
-            )
-            # Extract results
-            if hasattr(ora_res, 'shape') and ora_res.shape[0] > 0:
-                results[direction] = ora_res
+        if est_key:
+            est_data = mat.obsm[est_key]
+            if hasattr(est_data, 'iloc'):
+                scores = est_data.iloc[0].sort_values(ascending=False)
             else:
-                results[direction] = pd.DataFrame()
-        except Exception as e:
-            results[direction] = pd.DataFrame()
-            results[f"{direction}_error"] = str(e)
+                scores = pd.Series(est_data[0], dtype=float).sort_values(ascending=False)
 
-    return results
+            pvals = None
+            if pval_key:
+                pv_data = mat.obsm[pval_key]
+                if hasattr(pv_data, 'iloc'):
+                    pvals = pv_data.iloc[0]
+                else:
+                    pvals = pd.Series(pv_data[0], index=scores.index, dtype=float)
+
+            result_df = pd.DataFrame({
+                "term": scores.index,
+                "score": scores.values,
+                "padj": pvals.reindex(scores.index).values if pvals is not None else np.nan,
+            }).set_index("term")
+            return {"result": result_df}
+        else:
+            return {"error": f"No ORA results in obsm: {list(mat.obsm.keys())}"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def run_multi_gsea(de_results, output_dir=None):

@@ -50,8 +50,9 @@ def generate_report(gene, cell_type, tissue, qc_result, de_results,
         n_sig = de_results["is_significant"].sum() if "is_significant" in de_results.columns else 0
         sections.append(f"- **{n_sig}** genes significantly changed (|log2FC| > 0.5, FDR < 0.05)\n")
 
-        top_up = de_results[de_results["log2fc"] > 0].head(10)
-        top_down = de_results[de_results["log2fc"] < 0].tail(10).iloc[::-1]
+        # Strongest up (largest positive log2fc) and down (most negative log2fc)
+        top_up = de_results[de_results["log2fc"] > 0].nlargest(10, "log2fc")
+        top_down = de_results[de_results["log2fc"] < 0].nsmallest(10, "log2fc")
 
         if not top_up.empty:
             sections.append("**Top upregulated:**\n")
@@ -92,11 +93,16 @@ def generate_report(gene, cell_type, tissue, qc_result, de_results,
                 sig_df = gsea_df[gsea_df["FDR q-val"] < 0.25].dropna(subset=["NES"])
                 if not sig_df.empty:
                     sections.append(f"**{lib_name}** ({len(sig_df)} significant):\n")
-                    sections.append("| Pathway | NES | FDR |")
-                    sections.append("|---------|-----|-----|")
-                    for _, row in sig_df.nlargest(10, "NES").iterrows():
+                    # Show top positive AND top negative NES separately
+                    pos_sig = sig_df[sig_df["NES"] > 0].nlargest(5, "NES")
+                    neg_sig = sig_df[sig_df["NES"] < 0].nsmallest(5, "NES")
+                    top_both = pd.concat([pos_sig, neg_sig]).sort_values("NES", key=abs, ascending=False)
+                    sections.append("| Pathway | NES | FDR | Direction |")
+                    sections.append("|---------|-----|-----|-----------|")
+                    for _, row in top_both.iterrows():
                         name = row.name if hasattr(row, "name") and isinstance(row.name, str) else row.get("Term", "")
-                        sections.append(f"| {name} | {row['NES']:.2f} | {row['FDR q-val']:.3f} |")
+                        direction = "UP" if row["NES"] > 0 else "DOWN"
+                        sections.append(f"| {name} | {row['NES']:.2f} | {row['FDR q-val']:.3f} | {direction} |")
                     sections.append("")
                 else:
                     sections.append(f"**{lib_name}**: No significant pathways (FDR < 0.25)\n")
@@ -225,26 +231,41 @@ def _assess_convergence(qc_result, de_results, gsea_results, tf_activity,
     else:
         convergence.append({"dimension": "Functional", "signal": "?", "details": "GSEA not run"})
 
-    # Regulatory consistency (Phase 3c)
+    # Regulatory consistency (Phase 3c) — require statistical significance
     if tf_activity is not None and not tf_activity.empty:
-        top_tf = tf_activity.index[0]
-        top_score = tf_activity.iloc[0]["activity_score"]
-        convergence.append({
-            "dimension": "Regulatory",
-            "signal": "+",
-            "details": f"Top affected TF: {top_tf} ({top_score:+.2f})",
-        })
+        sig_tfs = tf_activity[tf_activity["pval"] < 0.05] if "pval" in tf_activity.columns else pd.DataFrame()
+        if not sig_tfs.empty:
+            top_tf = sig_tfs.index[0]
+            top_score = sig_tfs.iloc[0]["activity_score"]
+            convergence.append({
+                "dimension": "Regulatory",
+                "signal": "+",
+                "details": f"{len(sig_tfs)} significant TFs (p<0.05). Top: {top_tf} ({top_score:+.2f})",
+            })
+        else:
+            convergence.append({
+                "dimension": "Regulatory",
+                "signal": "~",
+                "details": f"TF scores computed but none significant (p<0.05)",
+            })
     else:
         convergence.append({"dimension": "Regulatory", "signal": "?", "details": "TF activity not available"})
 
-    # Pathway consistency (Phase 3d)
+    # Pathway consistency (Phase 3d) — require statistical significance
     if pathway_activity is not None and not pathway_activity.empty:
-        active = pathway_activity[pathway_activity["activity_score"].abs() > 1]
-        convergence.append({
-            "dimension": "Pathway",
-            "signal": "+" if len(active) > 0 else "~",
-            "details": f"{len(active)} pathways with |score| > 1",
-        })
+        sig_pw = pathway_activity[pathway_activity["pval"] < 0.05] if "pval" in pathway_activity.columns else pd.DataFrame()
+        if not sig_pw.empty:
+            convergence.append({
+                "dimension": "Pathway",
+                "signal": "+",
+                "details": f"{len(sig_pw)} significant pathways (p<0.05)",
+            })
+        else:
+            convergence.append({
+                "dimension": "Pathway",
+                "signal": "~",
+                "details": "Pathway scores computed but none significant (p<0.05)",
+            })
     else:
         convergence.append({"dimension": "Pathway", "signal": "?", "details": "PROGENy not available"})
 

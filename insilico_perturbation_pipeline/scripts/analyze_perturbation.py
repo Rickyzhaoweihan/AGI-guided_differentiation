@@ -95,7 +95,7 @@ def analyze_one_perturbation(pred, gene, args, expert_config):
 
     # ── Phase 2: Differential Expression ─────────────────────────
     print("  Phase 2: Differential expression...", end=" ", flush=True)
-    de_results = compute_de(X_ctrl, X_pert, gene_names)
+    de_results = compute_de(X_ctrl, X_pert, gene_names, n_bootstrap=args.n_bootstrap)
     n_sig = de_results["is_significant"].sum()
     print(f"{n_sig} significant genes")
 
@@ -103,12 +103,12 @@ def analyze_one_perturbation(pred, gene, args, expert_config):
     print("  Phase 1: Sanity checks...", end=" ", flush=True)
     # Get known targets from expert config and/or CollecTRI
     expert_targets = (expert_config.get("known_targets", {}) or {}).get(gene)
+    # CollecTRI lookup is a QC check, not literature — always attempt it
     collectri_targets = None
-    if not args.no_literature:
-        try:
-            collectri_targets = get_collectri_targets(gene)
-        except Exception:
-            pass
+    try:
+        collectri_targets = get_collectri_targets(gene)
+    except Exception:
+        pass
 
     qc_result = run_sanity_checks(
         de_results["log2fc"], gene, gene_names,
