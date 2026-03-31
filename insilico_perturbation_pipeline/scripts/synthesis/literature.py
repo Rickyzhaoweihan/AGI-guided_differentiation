@@ -143,26 +143,27 @@ def search_for_perturbation(gene, tissue, cell_type, top_pathways=None,
     Returns:
         dict with query → list of article dicts
     """
-    species_mesh = '"Homo sapiens"[Mesh]' if species == "human" else '"Mus musculus"[Mesh]'
+    # Use simpler species filter — Mesh with quotes can cause issues in URL encoding
+    species_filter = "human[tiab]" if species == "human" else "mouse[tiab]"
 
     queries = {
         "gene_in_context": (
-            f"({gene}[tiab]) AND ({cell_type}[tiab] OR {tissue}[tiab]) "
-            f"AND {species_mesh}"
+            f"({gene}[tiab]) AND ({cell_type}[tiab] OR {tissue}[tiab])"
         ),
         "gene_perturbation": (
-            f"({gene}[tiab]) AND (knockdown[tiab] OR knockout[tiab] OR perturbation[tiab]) "
-            f"AND ({tissue}[tiab]) AND {species_mesh}"
+            f"({gene}[tiab]) AND (knockdown[tiab] OR knockout[tiab] OR perturbation[tiab] OR KO[tiab])"
+        ),
+        "gene_function": (
+            f"({gene}[tiab]) AND ({species_filter})"
         ),
     }
 
     # Add pathway-specific queries for top 2 pathways
     if top_pathways:
         for i, pathway in enumerate(top_pathways[:2]):
-            # Clean pathway name for search
             pw_clean = pathway.replace("_", " ").replace("HALLMARK ", "")
             queries[f"gene_pathway_{i}"] = (
-                f"({gene}[tiab]) AND ({pw_clean}[tiab]) AND {species_mesh}"
+                f"({gene}[tiab]) AND ({pw_clean}[tiab])"
             )
 
     results = {}
