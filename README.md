@@ -49,16 +49,21 @@ AGI-guided_differentiation/
 ├── PLAN.md                              # Full multi-agent architecture plan
 ├── CLAUDE.md                            # Instructions for Claude Code
 │
-├── insilico_perturbation_pipeline/      # Self-contained perturbation pipeline
+├── insilico_perturbation_pipeline/      # Perturbation prediction pipeline
 │   ├── scripts/
-│   │   ├── preprocess_for_inference.py  # Step 1: prep scRNA-seq for STATE model
-│   │   ├── run_insilico_perturbation.py # Step 2: run STATE model inference
-│   │   ├── run_inference.sh             # Step 2 alt: SLURM job submission
-│   │   ├── extract_to_csv.py            # Step 3: split predictions to CSV
+│   │   ├── run_full_pipeline.py         # Config-driven orchestrator (prepare/submit/status)
+│   │   ├── prepare_celltype_run.py      # Subset h5ad + filter DEGs per cell type
+│   │   ├── preprocess_for_inference.py  # Normalize, align genes, create template
+│   │   ├── run_insilico_perturbation.py # Python wrapper for state tx infer
+│   │   ├── run_inference.sh             # SLURM job template (single run)
+│   │   ├── extract_to_csv.py            # Split predictions to CSV
 │   │   ├── train_state_model.py         # Optional: train your own model
 │   │   └── create_esm_pert_features.py  # Optional: generate ESM2 embeddings
-│   ├── configs/                         # Training configs (starter / full dataset)
-│   ├── models/                          # Bundled model metadata and checkpoints
+│   ├── configs/
+│   │   ├── collab_filtered_v1.yaml      # Demo: 4 datasets, 46 cell types
+│   │   ├── starter.toml                 # Training config (subset data)
+│   │   └── full_dataset.toml            # Training config (full dataset)
+│   ├── models/                          # Bundled state_sm model + gene_names.csv
 │   ├── data/                            # Place input h5ad here; outputs go here
 │   └── references/models.md             # Registry of available STATE models
 │
@@ -66,51 +71,61 @@ AGI-guided_differentiation/
 │   ├── run_gsea.py                      # Compute log2FC + run gseapy prerank
 │   └── test_results/TBX5/              # Example GSEA output (TBX5 perturbation)
 │
-└── hirn_publication_retrieval/          # HIRN literature retrieval submodule
+└── hirn_publication_retrieval/          # HIRN literature retrieval
 ```
 
 ---
 
 ## In-Silico Perturbation Pipeline
 
-Predicts how overexpressing each TF would shift cell state (gene expression) using a bundled pre-trained [STATE](https://github.com/genentech/state) model.
+Predicts how gene perturbations would shift cell state (gene expression) using pre-trained [STATE](https://github.com/genentech/state) models.
 
 ### Requirements
 
 ```bash
-conda activate /nfs/turbo/umms-drjieliu/usr/zheyuz/miniforge-pypy3/envs/state_env
+source activate /nfs/turbo/umms-drjieliu/usr/zheyuz/miniforge-pypy3/envs/state_env
 ```
 
-### Quick Start (Example Data)
+### Quick Start: Config-Driven Batch Mode
 
-Two example files are bundled for an end-to-end test:
-- `insilico_perturbation_pipeline/data/example_fetal_heart.h5ad` — fetal heart scRNA-seq (28,892 cells)
-- `insilico_perturbation_pipeline/data/example_cardiac_tfs.csv` — 20 cardiac TFs (TBX5, GATA4, MEF2C, ...)
+Run perturbation predictions across all cell types in multiple datasets from a YAML config:
+
+```bash
+# Prepare all datasets x cell types + generate SLURM jobs
+python insilico_perturbation_pipeline/scripts/run_full_pipeline.py prepare \
+    --config insilico_perturbation_pipeline/configs/collab_filtered_v1.yaml
+
+# Check completion status
+python insilico_perturbation_pipeline/scripts/run_full_pipeline.py status \
+    --config insilico_perturbation_pipeline/configs/collab_filtered_v1.yaml
+
+# Submit SLURM jobs (rate-limited, skips completed batches)
+python insilico_perturbation_pipeline/scripts/run_full_pipeline.py submit \
+    --config insilico_perturbation_pipeline/configs/collab_filtered_v1.yaml
+```
+
+See `configs/collab_filtered_v1.yaml` for a working example (4 datasets, 46 cell types, 81 batches).
+
+### Quick Start: Manual Single Run
+
+For a single h5ad + gene list (e.g., collaborator data):
 
 ```bash
 # Step 1: Preprocess
 python insilico_perturbation_pipeline/scripts/preprocess_for_inference.py \
-    --input insilico_perturbation_pipeline/data/example_fetal_heart.h5ad \
-    --gene-list insilico_perturbation_pipeline/data/example_cardiac_tfs.csv \
-    --output insilico_perturbation_pipeline/data/inference_template.h5ad \
-    --cell-type-col celltype \
-    --n-cells 10000 \
-    --seed 42
+    --input data/example_fetal_heart.h5ad \
+    --gene-list data/example_cardiac_tfs.csv \
+    --output data/inference_template.h5ad \
+    --cell-type-col celltype --n-cells 10000
 
-# Step 2: Run inference
-python insilico_perturbation_pipeline/scripts/run_insilico_perturbation.py \
-    --input insilico_perturbation_pipeline/data/inference_template.h5ad \
-    --output insilico_perturbation_pipeline/data/perturbation_predictions.h5ad \
-    --model-dir insilico_perturbation_pipeline/models \
-    --checkpoint "insilico_perturbation_pipeline/models/checkpoints/step=step=18000-val_loss=val_loss=1.7692.ckpt"
+# Step 2: Inference (SLURM or direct)
+sbatch insilico_perturbation_pipeline/scripts/run_inference.sh
 
-# Step 3: Export to CSV
+# Step 3: Export
 python insilico_perturbation_pipeline/scripts/extract_to_csv.py \
-    --predictions insilico_perturbation_pipeline/data/perturbation_predictions.h5ad \
-    --output-dir insilico_perturbation_pipeline/data/perturbation_csvs
+    --predictions data/perturbation_predictions.h5ad \
+    --output-dir data/perturbation_csvs
 ```
-
-For large jobs, use SLURM: edit paths in `run_inference.sh` and run `sbatch run_inference.sh`.
 
 ### Resource Requirements
 

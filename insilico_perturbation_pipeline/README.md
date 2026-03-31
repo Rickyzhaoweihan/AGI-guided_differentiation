@@ -1,163 +1,132 @@
-# In-Silico Perturbation Pipeline (Chen Lab Collaboration)
+# In-Silico Perturbation Pipeline
 
-Predict gene perturbation effects on cell state using trained State models.
-Data comes from Shuibing Chen's lab at Cornell — fetal tissue scRNA-seq from various organs/donors.
+Predict gene perturbation effects on cell state using trained State models. Supports both config-driven batch runs (all datasets x all cell types) and manual single-run mode.
 
-## Workflow
+## Quick Start: Config-Driven Batch Mode
 
-### Step 1: Gather Inputs
-
-Required inputs:
-1. **h5ad file** — scRNA-seq data (any tissue/donor)
-2. **Gene list** — perturbation targets (.xlsx, .csv, .tsv, or .txt)
-3. **Cell type column** — name in `.obs` (inspect data to find it)
-4. **Model** — which State model to use. See [references/models.md](references/models.md)
-5. **Output directory** — where to save all outputs
-
-### Step 2: Explore Input Data
-
-Before preprocessing, inspect the h5ad:
-
-```python
-import anndata as ad
-adata = ad.read_h5ad("path/to/data.h5ad")
-print(f"Shape: {adata.shape}")
-print(f"Obs columns: {adata.obs.columns.tolist()}")
-print(f"Var columns: {adata.var.columns.tolist()}")
-print(f"Cell types: {adata.obs['<cell_type_col>'].value_counts()}")
-```
-
-Check:
-- What column has cell type labels? (common: `celltype`, `cell_type`, `CellType`)
-- What column has gene names in `.var`? (common: `var_names`, `features`, `gene_name`)
-- **Data format**: Must be raw counts or log-normalized. Check for: integer values + high max (raw counts), negative values (scaled — BAD), float values with max ~10 (log-normalized). The model was trained on log-normalized data (`normalize_total` + `log1p`).
-- How many genes? Need full transcriptome (not just HVGs) for best results — model uses 18,080 genes
-- How many cells? If >15k, subsampling is recommended
-
-Also inspect the gene list file to confirm format and gene count.
-
-### Step 3: Preprocess
-
-Run the preprocessing script:
+Define datasets, cell types, and parameters in a YAML config, then run everything:
 
 ```bash
+source activate /nfs/turbo/umms-drjieliu/usr/zheyuz/miniforge-pypy3/envs/state_env
+
+# Prepare all cell types + generate SLURM jobs
+python scripts/run_full_pipeline.py prepare --config configs/collab_filtered_v1.yaml
+
+# Check what's done
+python scripts/run_full_pipeline.py status --config configs/collab_filtered_v1.yaml
+
+# Submit SLURM jobs (4 at a time, auto-skips completed)
+python scripts/run_full_pipeline.py submit --config configs/collab_filtered_v1.yaml
+```
+
+### Config Format
+
+```yaml
+run_name: my_run
+data_dir: /path/to/data
+output_dir: /path/to/runs/my_run
+
+defaults:
+  n_cells: 500          # cells per cell type
+  batch_size: 500        # genes per SLURM job
+  min_log2fc: 0.0        # DEG filter
+  max_padj: 1.0          # DEG filter
+  cell_type_col: ident
+  seed: 42
+
+model:
+  name: state_sm
+  model_dir: /path/to/model
+  checkpoint: checkpoints/best.ckpt
+
+slurm:
+  partition: drjieliu-h100,drjieliu-l40s,drjieliu-v100
+  time: "20:00:00"
+  mem: 256GB
+  max_concurrent: 4
+  conda_env: /path/to/envs/state_env
+  state_repo: /path/to/state_with_esm
+
+datasets:
+  adult_gut:
+    h5ad: adult_gut/adultgut.h5ad        # relative to data_dir
+    deg_csv: adult_gut/adultgutDEG.csv   # relative to data_dir
+    cell_types: ["Stem cells", "TA cells", "Enterocytes", ...]
+```
+
+See `configs/collab_filtered_v1.yaml` for a complete working example (4 datasets, 46 cell types).
+
+### Output Structure
+
+```
+runs/{run_name}/
+├── {dataset}/
+│   └── {cell_type}/
+│       ├── {cell_type}_subset.h5ad       ← subsetted cells
+│       ├── filtered_degs.csv             ← DEG table after filtering
+│       ├── gene_list_all.txt             ← all filtered genes
+│       └── batches/
+│           ├── gene_list_batch000.txt    ← genes for this batch
+│           ├── template_batch000.h5ad    ← inference template (SLURM creates)
+│           └── predictions_batch000.h5ad ← predictions (SLURM creates)
+├── slurm_jobs/                           ← one .sh per batch
+└── slurm_logs/
+```
+
+## Quick Start: Manual Single-Run Mode
+
+For a single h5ad + gene list (e.g., collaborator data):
+
+```bash
+# Step 1: Preprocess
 python scripts/preprocess_for_inference.py \
-    --input /path/to/data.h5ad \
-    --gene-list /path/to/gene_list.xlsx \
-    --output /path/to/output_dir/inference_template.h5ad \
+    --input data.h5ad \
+    --gene-list genes.xlsx \
+    --output inference_template.h5ad \
     --cell-type-col celltype \
-    --n-cells 10000 \
-    --seed 42
-```
+    --n-cells 10000
 
-The script handles:
-- **Normalization**: Auto-detects raw counts and applies `normalize_total` + `log1p` (matching model training). Warns on scaled/SCT data. Use `--skip-normalize` if data is already log-normalized.
-- Stratified sampling preserving cell type proportions
-- Gene alignment to the model's 18,080-gene format (missing genes zero-padded)
-- Creating control cells (non-targeting) + perturbation entries
-- Validation that perturbation targets exist in model gene set
-
-**Output**: inference template h5ad with shape `(n_cells * (n_perturbations + 1), 18080)`
-
-### Step 4: Validate Gene List
-
-Before running inference, validate the gene list:
-- Check overlap with ESM2 embeddings (19,790 genes) and model perturbation map
-- Check overlap with 18,080 expression gene set
-- Flag any mouse gene symbols from JASPAR — map to human orthologs (e.g., RHOX11 → RHOXF1)
-- Genes not in ESM2 will fall back to default encoding (less meaningful predictions)
-
-### Step 5: Run Inference via SLURM
-
-Edit `scripts/run_inference.sh` with your paths and submit:
-
-```bash
+# Step 2: Inference (SLURM or direct)
 sbatch scripts/run_inference.sh
-```
+# or
+python scripts/run_insilico_perturbation.py \
+    --input inference_template.h5ad \
+    --output perturbation_predictions.h5ad \
+    --model-dir models \
+    --checkpoint "models/checkpoints/step=step=18000-val_loss=val_loss=1.7692.ckpt"
 
-Key `state tx infer` parameters:
-- `--adata` — the inference template from Step 3
-- `--output` — where to save predictions
-- `--model-dir` — model training directory
-- `--checkpoint` — specific checkpoint file
-- `--pert-col target_gene` — always this (set by preprocessing)
-- `--celltype-col cell_type` — always this (set by preprocessing)
-- `--batch-col batch_var` — always this (set by preprocessing)
-
-SLURM settings (for ~100 perturbations x 10k cells):
-- **Preprocessing**: `--mem=256GB` (dense template is n_cells x n_conditions x 18080 x 4 bytes)
-- **state_sm inference**: any GPU partition, 8-20h, `--mem=256GB`
-- **state_base inference**: H100 only (`--partition=drjieliu-h100`), 20h, `--mem=256GB`
-- Always use `source activate /nfs/turbo/umms-drjieliu/usr/zheyuz/miniforge-pypy3/envs/state_env`
-- `state` CLI must be installed via `pip install -e .` from repo root (NOT `uv tool install`)
-
-### Step 6: Split Predictions
-
-The full prediction h5ad (~69 GB for 10k cells x 100 perts) is too large for collaborators. Split into per-perturbation files:
-
-```python
-import anndata as ad, os
-pred = ad.read_h5ad('perturbation_predictions.h5ad')
-os.makedirs('predictions_<model>/', exist_ok=True)
-
-# Control baseline
-ctrl = pred[pred.obs['target_gene'] == 'non-targeting'].copy()
-ctrl.write_h5ad('predictions_<model>/control_baseline.h5ad')
-
-# Each perturbation
-for p in pred.obs['target_gene'].unique():
-    if p != 'non-targeting':
-        pred[pred.obs['target_gene'] == p].copy().write_h5ad(f'predictions_<model>/{p}.h5ad')
-```
-
-Result: ~726 MB per file, loadable on any laptop.
-
-Alternatively, use `scripts/extract_to_csv.py` to export as CSV files:
-
-```bash
+# Step 3: Export
 python scripts/extract_to_csv.py \
     --predictions perturbation_predictions.h5ad \
-    --output-dir perturbation_csv_files
+    --output-dir perturbation_csvs
 ```
 
-### Step 7: Create Analysis Notebooks & Tutorials
+## Scripts
 
-Provide collaborators with:
-1. **Jupyter notebooks** (`analyze_predictions_<model>.ipynb`) — load from split h5ad files, compute DE on the fly
-2. **R Markdown tutorials** (`analyze_predictions_tutorial_<model>.Rmd`) — same analyses in R using `anndata` R package
+| Script | Purpose |
+|--------|---------|
+| `run_full_pipeline.py` | Config-driven orchestrator: prepare, submit, status |
+| `prepare_celltype_run.py` | Subset h5ad + filter DEGs for one cell type, batch genes |
+| `preprocess_for_inference.py` | Normalize, align to 18,080 genes, create inference template |
+| `run_insilico_perturbation.py` | Python wrapper for `state tx infer` |
+| `run_inference.sh` | SLURM job template (single run) |
+| `extract_to_csv.py` | Split prediction h5ad into per-perturbation CSVs |
+| `train_state_model.py` | Train a new State model (optional) |
+| `create_esm_pert_features.py` | Generate ESM2 embeddings (optional) |
 
-Both should work from split files (~2-4 GB RAM peak). See Jiajun and Jeya examples for templates.
+## Models
 
-## Critical Details
+| Model | GPU | Notes |
+|-------|-----|-------|
+| `state_sm` (bundled) | Any GPU | Faster, good for initial runs |
+| `state_base` (external) | H100 only | Better predictions, slower |
 
-- **Normalization**: The model was trained on log-normalized data (`sc.pp.normalize_total` + `sc.pp.log1p`). The preprocessing script auto-detects raw counts and normalizes. The `state tx infer` pipeline does NOT normalize internally — data must be pre-normalized. Ask collaborators for **raw counts**; we handle normalization.
-- **Perturbation encoding**: Both models use **ESM2 protein embeddings** (not one-hot) for perturbation encoding. Config: `pert_rep: onehot` with `perturbation_features_file: ESM2_pert_features.pt`. Coverage: ~19,790 human genes.
-- **Control cells are required**: Template MUST include `non-targeting` control cells. The preprocessing script handles this automatically.
-- **Gene alignment**: Model expects exactly 18,080 genes in a specific order. Preprocessing aligns to `competition_support_set/gene_names.csv`.
-- **Full transcriptome needed**: HVG-only data (e.g., 2,000 genes) -> ~16,000 zero-padded genes. Ask collaborators for all genes before HVG filtering.
-- **Obs column names after preprocessing**: Always `target_gene`, `cell_type`, `batch_var` regardless of original column names.
-- **Dense matrix**: The inference template uses dense float32 matrices (not sparse). Memory: `n_cells x (n_perts + 1) x 18080 x 4 bytes`.
-- **JASPAR gene lists**: May contain mouse gene symbols. Check and map to human orthologs before running.
-- **`state` CLI**: Must be installed in the conda env via `pip install -e .` from the state repo root. The old `uv tool install` symlink is broken.
+See [references/models.md](references/models.md) for paths and checkpoints.
 
-## Known Issues
+## Key Constraints
 
-- **Jiajun's prior runs used raw counts without normalization** — predictions may be suboptimal. Consider re-running with the updated preprocessing script.
-- **`sc.pp.normalize_total()` with default `target_sum=None`** normalizes to median library size, not 10,000. This matches training if training also used the default.
-
-## Prior Runs
-
-| Dataset | Tissue | Perturbations | Models Used | Output Dir |
-|---------|--------|---------------|-------------|------------|
-| Jiajun | Fetal heart | 20 cardiac TFs | state_sm, state_base | `jiajun_data/` |
-| Jeya | Fetal gut | 101 gut TFs (JASPAR) | state_sm, state_base | `jeya_data_and_pred/` |
-
-### Jeya Run Details (2026-03)
-- Input: `fetalgut_latest.h5ad` (71,674 cells x 36,601 genes, raw counts)
-- Gene list: `Genelistgut_updated.xlsx` (101 TFs, RHOX11->RHOXF1 mapped)
-- Cell types: Enterocytes (56k), TA (7.7k), Stem Cells (4.4k), EECs (1.7k), Goblet Cells (1.7k)
-- Subsampled to ~10k cells, normalized with `normalize_total` + `log1p`
-- 3 genes not in expression output: BHLHA15, ESR2, SOX11
-- Predictions split into `predictions_sm/` and `predictions_base/` (102 files each, ~726 MB per file)
-- Analysis notebooks: `analyze_predictions_sm.ipynb`, `analyze_predictions_base.ipynb`
-- R tutorials: `analyze_predictions_tutorial_sm.Rmd`, `analyze_predictions_tutorial_base.Rmd`
+- Model expects exactly **18,080 genes** — preprocessing handles alignment
+- Dense float32 matrices: memory = `n_cells x (n_perts + 1) x 18,080 x 4 bytes`
+- Input must be raw counts or log-normalized (auto-detected)
+- Use `source activate` (not `conda activate`) in SLURM
+- `state` CLI: `pip install -e .` from State repo (not `uv tool install`)

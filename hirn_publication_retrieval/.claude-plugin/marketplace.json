@@ -1,0 +1,67 @@
+{
+  "name": "hirn-literature-retrieve",
+  "owner": {
+    "name": "Yuanhao Huang",
+    "email": "noreply@example.com"
+  },
+  "metadata": {
+    "description": "Search HIRN (Human Islet Research Network) publications, retrieve full text from PubMed Central, and find relevant passages across ~1,160 articles from 9 HIRN consortia",
+    "version": "0.1.0",
+    "created": "2026-02-11",
+    "updated": "2026-02-11"
+  },
+  "plugins": [
+    {
+      "name": "hirn-literature-retrieve",
+      "description": "Search HIRN (Human Islet Research Network) publications, retrieve full text from PubMed Central, and find relevant passages across ~1,160 articles from 9 HIRN consortia (CBDS, CHIB, CMAD, CMAI, CTAR, HIREC, HPAC, Opportunity Pool, PanKbase)",
+      "source": "./"
+    }
+  ],
+  "activation": {
+    "keywords": [
+      "search HIRN publications",
+      "find HIRN research",
+      "retrieve HIRN articles",
+      "search Human Islet Research Network",
+      "find papers from HIRN consortia",
+      "HIRN published works",
+      "islet research network publications",
+      "CBDS",
+      "CHIB",
+      "CMAD",
+      "CMAI",
+      "CTAR",
+      "HIREC",
+      "HPAC",
+      "PanKbase",
+      "Opportunity Pool"
+    ],
+    "patterns": [
+      "(?i)(search|find|look\\s+for)\\s+HIRN\\s+(publications?|research|articles?|papers?)",
+      "(?i)HIRN\\s+(published\\s+works|literature)",
+      "(?i)(search|find)\\s+(Human\\s+Islet\\s+Research\\s+Network|islet\\s+research\\s+network)",
+      "(?i)(CBDS|CHIB|CMAD|CMAI|CTAR|HIREC|HPAC|PanKbase)\\s+(publications?|papers?|research)"
+    ]
+  },
+  "usage": {
+    "when_to_use": [
+      "User asks to search HIRN publications on a topic",
+      "User mentions HIRN consortia (CBDS, CHIB, CMAD, CMAI, CTAR, HIREC, HPAC, PanKbase)",
+      "User wants to find islet research network articles",
+      "User needs relevant passages from HIRN literature",
+      "User asks about Human Islet Research Network published works"
+    ],
+    "when_not_to_use": [
+      "User asks to search PubMed broadly (not HIRN-specific)",
+      "User wants non-HIRN biomedical literature",
+      "User asks about clinical trials or databases unrelated to HIRN"
+    ]
+  },
+  "test_queries": [
+    "Search HIRN publications for islet autoimmunity",
+    "Find HIRN research on beta cell regeneration",
+    "What has the HPAC consortium published on pancreatic islets?",
+    "Search Human Islet Research Network for HLA markers",
+    "Find CBDS papers on type 1 diabetes prediction"
+  ]
+}
