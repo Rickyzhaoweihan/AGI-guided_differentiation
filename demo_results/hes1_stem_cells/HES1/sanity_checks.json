@@ -1,0 +1,25 @@
+{
+  "tier": "WARN",
+  "checks": [
+    {
+      "check": "housekeeping_stability",
+      "result": "PASS",
+      "details": "All 5 HK genes stable (max |log2FC| = 0.4449)"
+    },
+    {
+      "check": "effect_magnitude",
+      "result": "PASS",
+      "details": "Median |log2FC| = 0.0014"
+    },
+    {
+      "check": "self_knockdown",
+      "result": "WARN",
+      "details": "HES1 log2FC = 0.0121 (expected < 0). May indicate model didn't encode self-suppression, or gene has autoregulatory feedback."
+    },
+    {
+      "check": "known_targets",
+      "result": "PASS",
+      "details": "29/91 (32%) targets responded as expected. BCL2: +0.000 (unexpected); COL1A2: +0.001 (unexpected); SLC25A5: -0.006 (correct); IL6: +0.000 (unexpected); SPP1: -0.016 (correct); RB1: +0.039 (unexpected); KDM6B: -0.005 (correct); SAR1B: +0.072 (unexpected); ADAMTS5: -0.002 (correct); JUN: +0.243 (unexpected)"
+    }
+  ]
+}

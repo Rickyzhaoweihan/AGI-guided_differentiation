@@ -25,8 +25,10 @@ from pathlib import Path
 from tqdm import tqdm
 
 
-# Default path to the 18,080 target genes from the competition gene list
-DEFAULT_GENE_NAMES = "/nfs/turbo/umms-drjieliu/usr/rickyhan/AGI-guided_differentiation/insilico_perturbation_pipeline/models/gene_names.csv"
+# Default path to the 18,080 target genes — prefer bundled copy, NFS fallback
+_bundled = Path(__file__).parent.parent / "models" / "gene_names.csv"
+_nfs = Path("/nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/competition_support_set/competition_support_set/gene_names.csv")
+DEFAULT_GENE_NAMES = str(_bundled if _bundled.exists() else _nfs)
 
 
 def load_gene_list(gene_list_path):

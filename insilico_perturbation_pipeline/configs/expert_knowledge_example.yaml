@@ -1,0 +1,53 @@
+# Expert Knowledge Configuration — Adult Gut Example
+# All fields are optional. Fill in what you know; the system uses defaults for the rest.
+
+# Custom gene sets to score in every perturbation analysis
+# Each set is scored separately in Phase 5 (cell state scoring)
+custom_gene_sets:
+  gut_stem_markers: [LGR5, OLFM4, ASCL2, SOX9, SMOC2, RGMB]
+  enterocyte_markers: [FABP1, FABP2, VIL1, ANPEP, SLC5A1, RBP2]
+  goblet_markers: [MUC2, TFF3, CLCA1, SPDEF, AGR2]
+  paneth_markers: [LYZ, DEFA5, DEFA6, MMP7, REG3A]
+  enteroendocrine_markers: [CHGA, NEUROD1, PAX4, NKX2-2]
+  wnt_targets: [AXIN2, LGR5, MYC, CCND1, CD44, TCF7L2]
+  notch_targets: [HES1, HEY1, HEY2, NRARP, DLL1]
+
+# Known TF targets — used in Phase 1 sanity checks
+# "activates": genes this TF is known to activate (should decrease on knockdown)
+# "represses": genes this TF is known to repress (should increase on knockdown)
+known_targets:
+  CDX2:
+    activates: [MUC2, LYZ, FABP1, VIL1, SI, ALPI]
+    represses: []
+  HNF4A:
+    activates: [APOB, APOA4, CUBN, FABP1, SLC5A1]
+    represses: []
+  GATA4:
+    activates: [HNF1A, ONECUT1, HAND1]
+    represses: []
+  KLF4:
+    activates: [MUC2, TFF3, SPDEF]
+    represses: [MYC, CCND1]
+
+# Hypotheses to test — included in the report narrative
+hypotheses:
+  - "CDX2 knockdown should reduce enterocyte identity markers and may increase stem cell markers"
+  - "HNF4A knockdown should primarily affect lipid/metabolic gene programs"
+  - "GATA4 effects should be cell-type-specific: strong in enterocytes, weak in stem cells"
+
+# Context for the LLM synthesis narrative
+context: |
+  Adult gut scRNA-seq data from healthy human donors.
+  Studying transcription factors that maintain intestinal epithelial cell identity.
+  Cell types include: stem cells, TA cells, enterocytes, goblet cells, EECs, Paneth cells.
+  DEGs were filtered using DESeq2 with avgExpr > 1.
+
+# Focus genes — analyze these first (others analyzed if --target-gene not specified)
+focus_genes: [CDX2, HNF4A, GATA4, KLF4]
+
+# Focus pathways — highlight in report if they appear in GSEA results
+focus_pathways:
+  - "Wnt signaling"
+  - "Notch signaling"
+  - "intestinal differentiation"
+  - "lipid metabolism"

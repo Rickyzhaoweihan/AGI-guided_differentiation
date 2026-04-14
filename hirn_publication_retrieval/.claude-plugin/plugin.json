@@ -1,0 +1,6 @@
+{
+  "name": "hirn-literature-retrieve",
+  "description": "Search HIRN (Human Islet Research Network) publications, retrieve full text from PubMed Central, and find relevant passages across ~1,160 articles from 9 HIRN consortia",
+  "version": "0.1.0",
+  "license": "MIT"
+}

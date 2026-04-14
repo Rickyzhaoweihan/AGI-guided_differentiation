@@ -31,10 +31,14 @@ warnings.filterwarnings("ignore")
 
 def compute_log2fc(pred, target_gene, cell_type=None):
     """
-    Compute per-gene log2FC: mean(perturbed) - mean(control) in log-space.
+    Compute per-gene expression changes: perturbed vs. non-targeting control.
 
-    Since predictions are already log-normalized, difference ≈ log2FC.
-    Returns a Series indexed by gene name, sorted descending.
+    Predictions are log1p-normalized. We compute:
+    - log2fc: true log2 fold change from natural-scale means:
+              log2(mean(expm1(pert)) + 1) - log2(mean(expm1(ctrl)) + 1)
+    - log_diff: mean log-expression difference (used as GSEA ranking statistic)
+
+    Returns a DataFrame indexed by gene name, sorted by log_diff descending.
     """
     mask_ctrl = pred.obs["target_gene"] == "non-targeting"
     mask_pert = pred.obs["target_gene"] == target_gene
@@ -54,17 +58,24 @@ def compute_log2fc(pred, target_gene, cell_type=None):
         X_ctrl = X_ctrl.toarray()
         X_pert = X_pert.toarray()
 
-    mean_ctrl = np.array(X_ctrl.mean(axis=0)).flatten()
-    mean_pert = np.array(X_pert.mean(axis=0)).flatten()
-    log2fc = mean_pert - mean_ctrl  # difference in log space ≈ log2FC
+    # Mean in log-space (for GSEA ranking — any monotonic statistic works)
+    mean_log_ctrl = np.array(X_ctrl.mean(axis=0)).flatten()
+    mean_log_pert = np.array(X_pert.mean(axis=0)).flatten()
+    log_diff = mean_log_pert - mean_log_ctrl
+
+    # True log2FC from natural-scale means: log2((mean(expm1(pert))+1) / (mean(expm1(ctrl))+1))
+    mean_nat_ctrl = np.array(np.expm1(X_ctrl).mean(axis=0)).flatten()
+    mean_nat_pert = np.array(np.expm1(X_pert).mean(axis=0)).flatten()
+    log2fc = np.log2(mean_nat_pert + 1) - np.log2(mean_nat_ctrl + 1)
 
     gene_names = pred.var_names.tolist()
     result = pd.DataFrame({
         "gene":      gene_names,
         "log2fc":    log2fc,
-        "mean_pert": mean_pert,
-        "mean_ctrl": mean_ctrl,
-    }).set_index("gene").sort_values("log2fc", ascending=False)
+        "log_diff":  log_diff,
+        "mean_pert": mean_log_pert,
+        "mean_ctrl": mean_log_ctrl,
+    }).set_index("gene").sort_values("log_diff", ascending=False)
 
     return result
 
@@ -94,7 +105,7 @@ def run_gsea_preranked(ranked_genes, gene_sets, output_dir, label):
 
 
 def plot_volcano(ranked_genes, target_gene, output_path, min_abs_lfc=0.1, n_label=20):
-    """Volcano-style plot: log2FC vs. mean expression."""
+    """MA-style plot: true log2FC vs. mean expression."""
     df = ranked_genes.copy()
     df["significant"] = df["log2fc"].abs() > min_abs_lfc
 
@@ -119,7 +130,7 @@ def plot_volcano(ranked_genes, target_gene, output_path, min_abs_lfc=0.1, n_labe
 
     ax.axhline(0, color="black", linewidth=0.5, linestyle="--")
     ax.set_xlabel("Mean control expression (log-norm)")
-    ax.set_ylabel("Predicted log2FC (perturbed vs. control)")
+    ax.set_ylabel("log2 fold change (natural-scale means)")
     ax.set_title(f"Predicted DE: {target_gene} perturbation")
     ax.legend(fontsize=8)
     plt.tight_layout()
@@ -182,8 +193,8 @@ def main():
                 print(f"  Skipping: no cells for this condition")
                 continue
 
-            ranked.to_csv(out_dir / "log2fc.csv")
-            print(f"  log2FC computed: {(ranked['log2fc'].abs() > args.min_abs_lfc).sum()} genes |lfc| > {args.min_abs_lfc}")
+            ranked.to_csv(out_dir / "de_results.csv")
+            print(f"  DE computed: {(ranked['log2fc'].abs() > args.min_abs_lfc).sum()} genes |log2FC| > {args.min_abs_lfc}")
 
             # Volcano plot
             plot_volcano(ranked, label, out_dir / "volcano.png", args.min_abs_lfc)
@@ -199,7 +210,9 @@ def main():
                 if len(sig) > 0:
                     print(f"  Top pathway: {sig.index[0]}  NES={sig['NES'].iloc[0]:.2f}")
 
-                for _, row in gsea_res.nlargest(args.n_top_pathways, "NES").iterrows():
+                # Only include FDR-significant pathways in the summary
+                sig_for_summary = gsea_res[gsea_res["FDR q-val"] < 0.25]
+                for _, row in sig_for_summary.nlargest(args.n_top_pathways, "NES").iterrows():
                     all_summaries.append({
                         "perturbation": gene,
                         "cell_type": ct or "all",

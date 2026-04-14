@@ -1,0 +1,103 @@
+# Configuration for collaborator's DESeq2-filtered DEG lists (avgExpr > 1)
+# Run: python scripts/run_full_pipeline.py prepare --config configs/collab_filtered_v1.yaml
+#      python scripts/run_full_pipeline.py submit --config configs/collab_filtered_v1.yaml
+
+run_name: collab_filtered_v1
+
+# Input data directory (paths in datasets section are relative to this)
+data_dir: /nfs/turbo/umms-drjieliu/proj/in_silico_pert/agi_guide_differentation_workspace/perturbation_workspace/data
+
+# Output directory for all runs
+output_dir: /nfs/turbo/umms-drjieliu/proj/in_silico_pert/agi_guide_differentation_workspace/perturbation_workspace/runs/collab_filtered_v1
+
+# Default parameters (can be overridden per dataset)
+defaults:
+  n_cells: 500
+  batch_size: 500
+  min_log2fc: 0.0       # No additional filtering — DEGs already filtered by collaborator
+  max_padj: 1.0          # No additional filtering
+  cell_type_col: ident
+  seed: 42
+
+# Model configuration
+model:
+  name: state_sm
+  model_dir: /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm/output_state_sm_baseline/state_sm_40k_20251202_001509
+  checkpoint: checkpoints/step=step=18000-val_loss=val_loss=1.7692.ckpt
+
+# SLURM configuration
+slurm:
+  partition: drjieliu-h100,drjieliu-l40s,drjieliu-v100
+  time: "20:00:00"
+  mem: 256GB
+  max_concurrent: 4
+  conda_env: /nfs/turbo/umms-drjieliu/usr/zheyuz/miniforge-pypy3/envs/state_env
+  state_repo: /nfs/turbo/umms-drjieliu/usr/zheyuz/state_with_esm
+
+# Datasets: each entry has h5ad, deg_csv (relative to data_dir), and cell_types
+datasets:
+  adult_gut:
+    h5ad: adult_gut/adultgut.h5ad
+    deg_csv: adult_gut/adult_FindAllMarkers_DESeq2_filtered_avgExpr_gt1.csv
+    cell_types:
+      - "Stem cells"
+      - "TA cells"
+      - "Enterocytes"
+      - "Goblet cells"
+      - "EECs"
+      - "Paneth cells"
+
+  fetal_gut:
+    h5ad: fetal_gut/fetalgut1.h5ad
+    deg_csv: fetal_gut/fetal_FindAllMarkers_DESeq2_filtered_avgExpr_gt1.csv
+    cell_types:
+      - "Stem cells"
+      - "TA cells"
+      - "Enterocytes"
+      - "Goblet cells"
+      - "Enteroendocrine cells"
+      - "Paneth cells"
+
+  human_islets:
+    h5ad: human_islets/humanislet.h5ad
+    deg_csv: human_islets/humanislet_FindAllMarkers_DESeq2_filtered_avgExpr_gt1.csv
+    cell_types:
+      - "Alpha"
+      - "Beta"
+      - "Delta"
+      - "Gamma"
+      - "Epsilon"
+      - "Polyhormonal"
+      - "Acinar"
+      - "Ductal"
+      - "Endothelial"
+      - "Stellate"
+      - "Mast"
+      - "Immune"
+
+  hypothalamus_neurons:
+    h5ad: hypothalamus_neurons/ARC.h5ad
+    deg_csv: hypothalamus_neurons/hypothalamus_FindAllMarkers_DESeq2_filtered_avgExpr_gt1.csv
+    cell_types:
+      - "Cluster0"
+      - "Cluster1"
+      - "Cluster2"
+      - "Cluster3"
+      - "Cluster4"
+      - "Cluster5"
+      - "Cluster6"
+      - "Cluster7"
+      - "Cluster8"
+      - "Cluster9"
+      - "Cluster10"
+      - "Cluster11"
+      - "Cluster12"
+      - "Cluster13"
+      - "Cluster14"
+      - "Cluster15"
+      - "Cluster16"
+      - "Cluster17"
+      - "Cluster18"
+      - "Cluster19"
+      - "Cluster20"
+      - "Unknown"

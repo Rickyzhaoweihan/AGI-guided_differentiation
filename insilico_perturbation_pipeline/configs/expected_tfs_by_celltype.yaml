@@ -1,0 +1,186 @@
+description: 'Expected (ground-truth) transcription factors per cell type, curated by collaborator. Used as positive controls
+  for Phase 7 perturbation scoring evaluation: the pipeline should rank these TFs in the top-K when scoring perturbations
+  against cell-type marker gene sets. Source: docs/originals/AGImodel.xlsx (provided 2026-04-13).'
+source_file: docs/originals/AGImodel.xlsx
+last_updated: '2026-04-14'
+cell_types:
+  gut/d_cells:
+    tissue: Gut
+    cell_type: D cells
+    training_dataset: Adult gut
+    expected_tfs:
+    - HHEX
+  gut/enterochromaffin_cells:
+    tissue: Gut
+    cell_type: Enterochromaffin cells
+    training_dataset: Adult gut
+    expected_tfs:
+    - LMX1A
+    - FEV
+  gut/enterocytes:
+    tissue: Gut
+    cell_type: Enterocytes
+    training_dataset: Fetal and adult gut
+    expected_tfs:
+    - HNF4A
+    - HNF4G
+    - CDX2
+    - KLF4
+    - KLF5
+    - GATA4
+    - GATA6
+    - HES1
+  gut/enteroendocrine_cells:
+    tissue: Gut
+    cell_type: Enteroendocrine cells
+    training_dataset: Fetal and adult gut
+    expected_tfs:
+    - ATOH1
+    - NEUROG3
+    - NEUROD1
+    - INSM1
+    - PAX6
+    - ISL1
+  gut/goblet_cells:
+    tissue: Gut
+    cell_type: Goblet cells
+    training_dataset: Fetal and adult gut
+    expected_tfs:
+    - ATOH1
+    - SPDEF
+    - KLF4
+    - GFI
+    - XBP1
+    - CREB3L1
+    - HES1
+  gut/i_cells:
+    tissue: Gut
+    cell_type: I cells
+    training_dataset: Adult gut
+    expected_tfs:
+    - PAX6
+    - RFX6
+    - ARX
+    - GATA4
+  gut/k_cells:
+    tissue: Gut
+    cell_type: K cells
+    training_dataset: Adult gut
+    expected_tfs:
+    - PAX6
+    - RFX6
+  gut/l_cells:
+    tissue: Gut
+    cell_type: L cells
+    training_dataset: Adult gut
+    expected_tfs:
+    - GCG
+    - ARX
+    - RFX6
+  gut/stem_cells:
+    tissue: Gut
+    cell_type: Stem cells
+    training_dataset: Fetal and adult gut
+    expected_tfs:
+    - ASCL2
+    - MYC
+    - TCF7L2
+    - SOX9
+    - KLF5
+    - CDX2
+    - FOXM1
+  gut/ta_cells:
+    tissue: Gut
+    cell_type: TA cells
+    training_dataset: Fetal and adult gut
+    expected_tfs:
+    - MYC
+    - FOXM1
+    - E2F1
+    - E2F4
+    - KLF5
+    - TCF7L2
+  gut/x_cells:
+    tissue: Gut
+    cell_type: X cells
+    training_dataset: Adult gut
+    expected_tfs:
+    - NKX2-2
+    - ISL1
+    - PAX6
+    - FOXA1
+    - FOXA2
+  human_islets/acinar_cells:
+    tissue: Human islets
+    cell_type: Acinar cells
+    training_dataset: HPAP
+    expected_tfs:
+    - PTF1A
+    - RBPJL
+    - NR5A2
+    - GATA4
+    - GATA6
+    - FOXA2
+    - BHLHA15
+  human_islets/alpha_cells:
+    tissue: Human islets
+    cell_type: Alpha cells
+    training_dataset: HPAP
+    expected_tfs:
+    - ARX
+    - MAFB
+    - IRX1
+    - IRX2
+    - FEV
+    - ISL1
+    - RFX6
+    - PAX6
+    - NEUROD1
+    - NKX2-2
+    - NEUROG3
+  human_islets/beta_cells:
+    tissue: Human islets
+    cell_type: Beta cells
+    training_dataset: HPAP
+    expected_tfs:
+    - PDX1
+    - NKX6-1
+    - MAFA
+    - NEUROD1
+    - ISL1
+    - RFX6
+    - PAX6
+    - NKX2-2
+    - UCN3
+  human_islets/delta_cells:
+    tissue: Human islets
+    cell_type: Delta cells
+    training_dataset: HPAP
+    expected_tfs:
+    - HHEX
+    - PDX1
+    - NKX6-1
+    - ISL1
+    - PAX6
+    - RFX6
+    - NEUROD1
+    - NKX2-2
+  human_islets/ductal_cells:
+    tissue: Human islets
+    cell_type: Ductal cells
+    training_dataset: HPAP
+    expected_tfs:
+    - SOX9
+    - HNF1B
+    - ONECUT1
+    - KLF5
+    - FOXA2
+    - GATA6
+    - HES1
+  human_islets/enterochromaffin_cells:
+    tissue: Human islets
+    cell_type: Enterochromaffin cells
+    training_dataset: HPAP
+    expected_tfs:
+    - LMX1A
+    - FEV
