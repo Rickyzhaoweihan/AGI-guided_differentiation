@@ -1,0 +1,733 @@
+description: 'Curated differentiation compounds, indexed by signaling pathway. This is the ''biologist common sense filter''
+  for Phase 8 chemical candidate aggregation: when our pipeline detects an enriched pathway (via GSEA, PROGENy, or DGIdb),
+  we map it to known-good cell-culture compounds from this table rather than returning every drug DGIdb knows about. Source:
+  docs/originals/AGImodel.xlsx (collaborator-curated, 2026-04-13).'
+source_file: docs/originals/AGImodel.xlsx
+last_updated: '2026-04-14'
+pathways:
+  BMP activation:
+    compounds:
+    - BMP4
+    used_in_celltypes:
+    - gut/d_cells
+    - gut/enterochromaffin_cells
+    - gut/enterocytes
+    - gut/enteroendocrine_cells
+    - gut/goblet_cells
+    - gut/i_cells
+    - gut/k_cells
+    - gut/l_cells
+    - gut/x_cells
+    - human_islets/ductal_cells
+    n_celltypes: 10
+  BMP inhibition:
+    compounds:
+    - Dosomorphin
+    - LDN-193189
+    - Noggin
+    used_in_celltypes:
+    - gut/stem_cells
+    - gut/ta_cells
+    - human_islets/acinar_cells
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/delta_cells
+    n_celltypes: 6
+  Bile acid signaling:
+    compounds:
+    - Bile acids
+    - TGR5 agonists
+    used_in_celltypes:
+    - gut/l_cells
+    n_celltypes: 1
+  EGFR signaling:
+    compounds:
+    - EGF
+    used_in_celltypes:
+    - gut/enterocytes
+    - gut/goblet_cells
+    - gut/stem_cells
+    - gut/ta_cells
+    n_celltypes: 4
+  FGF signaling:
+    compounds:
+    - FGF10
+    - FGF7
+    used_in_celltypes:
+    - human_islets/acinar_cells
+    n_celltypes: 1
+  Glucocorticoid signaling:
+    compounds:
+    - Dexamethasone
+    used_in_celltypes:
+    - gut/enterocytes
+    - human_islets/beta_cells
+    n_celltypes: 2
+  Hedgehog inhibition:
+    compounds:
+    - Cyclopamine
+    - SANT1
+    used_in_celltypes:
+    - gut/d_cells
+    - gut/enteroendocrine_cells
+    - gut/stem_cells
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/delta_cells
+    n_celltypes: 6
+  IL-4 / IL-13 signaling:
+    compounds:
+    - IL-4
+    - IL13
+    used_in_celltypes:
+    - gut/goblet_cells
+    n_celltypes: 1
+  Notch activation:
+    compounds:
+    - Jagged1/DLL4 ligands
+    used_in_celltypes:
+    - gut/enterocytes
+    - gut/stem_cells
+    - human_islets/ductal_cells
+    n_celltypes: 3
+  Notch inhibition:
+    compounds:
+    - DAPT
+    - Dibenzazepine
+    used_in_celltypes:
+    - gut/d_cells
+    - gut/enterochromaffin_cells
+    - gut/enteroendocrine_cells
+    - gut/goblet_cells
+    - gut/i_cells
+    - gut/k_cells
+    - gut/l_cells
+    - gut/x_cells
+    - human_islets/acinar_cells
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/delta_cells
+    n_celltypes: 12
+  Nutrient signaling:
+    compounds:
+    - Long-chain fatty acids
+    - amino acids
+    - fatty acids
+    - glucose modulation
+    - octanoate
+    used_in_celltypes:
+    - gut/i_cells
+    - gut/k_cells
+    - gut/x_cells
+    n_celltypes: 3
+  PI3K, AKT signaling:
+    compounds:
+    - IGF-1
+    - Insulin
+    used_in_celltypes:
+    - human_islets/delta_cells
+    n_celltypes: 1
+  PI3K, AKT, mTOR signaling:
+    compounds:
+    - IGF-1
+    - Insulin
+    - Rapamycin
+    used_in_celltypes:
+    - human_islets/beta_cells
+    n_celltypes: 1
+  PPAR signaling:
+    compounds:
+    - Rosiglitazone
+    used_in_celltypes:
+    - gut/enterocytes
+    - human_islets/beta_cells
+    n_celltypes: 2
+  Prolactin / JAK-STAT signaling:
+    compounds:
+    - Placental lactogen
+    - Prolactin
+    used_in_celltypes:
+    - human_islets/enterochromaffin_cells
+    n_celltypes: 1
+  Retinoic Acid signaling:
+    compounds:
+    - BMS493
+    - Retinoic acid
+    used_in_celltypes:
+    - human_islets/acinar_cells
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/ductal_cells
+    n_celltypes: 4
+  Short chain fatty acids:
+    compounds:
+    - Acetate
+    - Butyrate
+    - Propionate
+    used_in_celltypes:
+    - gut/l_cells
+    n_celltypes: 1
+  TGF-beta signaling:
+    compounds:
+    - TGF-β1
+    - TGF-β1 / TGF-β2 ligands
+    used_in_celltypes:
+    - gut/d_cells
+    - gut/enterochromaffin_cells
+    - gut/enterocytes
+    - gut/enteroendocrine_cells
+    - gut/goblet_cells
+    - gut/i_cells
+    - gut/k_cells
+    - gut/l_cells
+    - gut/x_cells
+    - human_islets/ductal_cells
+    n_celltypes: 10
+  Tgfb/Activin/Nodal signaling:
+    compounds:
+    - A83-01 (late)
+    - Activin A (early)
+    - Activin A (early) SB431542
+    - SB431542 (late)
+    used_in_celltypes:
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/delta_cells
+    n_celltypes: 3
+  Thyroid hormone signaling:
+    compounds:
+    - T3 (triiodothyronine)
+    used_in_celltypes:
+    - human_islets/beta_cells
+    n_celltypes: 1
+  Tryptophan metabolism:
+    compounds:
+    - BH4
+    - tryptophan supplementation
+    used_in_celltypes:
+    - gut/enterochromaffin_cells
+    - human_islets/enterochromaffin_cells
+    n_celltypes: 2
+  Wnt/beta-catenin signaling:
+    compounds:
+    - CHIR99021
+    - CHIR99021 (early)
+    - IWP2
+    - IWP2 (late)
+    - IWR-1
+    - IWR-1 (late)
+    - R-spondin
+    - Wnt3a
+    used_in_celltypes:
+    - gut/d_cells
+    - gut/enterochromaffin_cells
+    - gut/enterocytes
+    - gut/enteroendocrine_cells
+    - gut/goblet_cells
+    - gut/i_cells
+    - gut/k_cells
+    - gut/l_cells
+    - gut/stem_cells
+    - gut/ta_cells
+    - gut/x_cells
+    - human_islets/acinar_cells
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/delta_cells
+    - human_islets/ductal_cells
+    n_celltypes: 16
+  YAP/TAZ signaling:
+    compounds: []
+    used_in_celltypes:
+    - gut/stem_cells
+    - gut/ta_cells
+    n_celltypes: 2
+  cAMP/PKA activation:
+    compounds:
+    - IBMX
+    - forskolin
+    used_in_celltypes:
+    - gut/d_cells
+    - gut/enterochromaffin_cells
+    - gut/enteroendocrine_cells
+    - gut/i_cells
+    - gut/k_cells
+    - gut/l_cells
+    - gut/x_cells
+    - human_islets/alpha_cells
+    - human_islets/beta_cells
+    - human_islets/delta_cells
+    - human_islets/enterochromaffin_cells
+    n_celltypes: 11
+  mTOR signaling:
+    compounds:
+    - Glucose
+    - Rapamycin
+    - insulin signaling
+    used_in_celltypes:
+    - gut/goblet_cells
+    - human_islets/enterochromaffin_cells
+    n_celltypes: 2
+per_cell_type:
+  gut/d_cells:
+    tissue: Gut
+    cell_type: D cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - IWP2
+      - IWR-1
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: Hedgehog inhibition
+      compounds:
+      - Cyclopamine
+  gut/enterochromaffin_cells:
+    tissue: Gut
+    cell_type: Enterochromaffin cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - IWP2
+      - IWR-1
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: Tryptophan metabolism
+      compounds:
+      - tryptophan supplementation
+      - BH4
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+  gut/enterocytes:
+    tissue: Gut
+    cell_type: Enterocytes
+    pathway_chemicals:
+    - pathway: Notch activation
+      compounds:
+      - Jagged1/DLL4 ligands
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - IWP2
+      - IWR-1
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: EGFR signaling
+      compounds:
+      - EGF
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: PPAR signaling
+      compounds:
+      - Rosiglitazone
+    - pathway: Glucocorticoid signaling
+      compounds:
+      - Dexamethasone
+  gut/enteroendocrine_cells:
+    tissue: Gut
+    cell_type: Enteroendocrine cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2 (late)
+      - IWR-1 (late)
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: Hedgehog inhibition
+      compounds:
+      - Cyclopamine
+  gut/goblet_cells:
+    tissue: Gut
+    cell_type: Goblet cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2 (late)
+      - IWR-1 (late)
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: IL-4 / IL-13 signaling
+      compounds:
+      - IL13
+      - IL-4
+    - pathway: EGFR signaling
+      compounds:
+      - EGF
+    - pathway: mTOR signaling
+      compounds:
+      - Rapamycin
+  gut/i_cells:
+    tissue: Gut
+    cell_type: I cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - IWP2
+      - IWR-1
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: Nutrient signaling
+      compounds:
+      - Long-chain fatty acids
+      - amino acids
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+  gut/k_cells:
+    tissue: Gut
+    cell_type: K cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - IWP2
+      - IWR-1
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: Nutrient signaling
+      compounds:
+      - fatty acids
+      - glucose modulation
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+  gut/l_cells:
+    tissue: Gut
+    cell_type: L cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021
+      - R-spondin
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: Short chain fatty acids
+      compounds:
+      - Butyrate
+      - Propionate
+      - Acetate
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: Bile acid signaling
+      compounds:
+      - Bile acids
+      - TGR5 agonists
+  gut/stem_cells:
+    tissue: Gut
+    cell_type: Stem cells
+    pathway_chemicals:
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021
+      - R-spondin
+      - Wnt3a
+    - pathway: Notch activation
+      compounds:
+      - Jagged1/DLL4 ligands
+    - pathway: BMP inhibition
+      compounds:
+      - Noggin
+      - LDN-193189
+    - pathway: EGFR signaling
+      compounds:
+      - EGF
+    - pathway: Hedgehog inhibition
+      compounds:
+      - Cyclopamine
+    - pathway: YAP/TAZ signaling
+      compounds: []
+  gut/ta_cells:
+    tissue: Gut
+    cell_type: TA cells
+    pathway_chemicals:
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021
+      - R-spondin
+      - Wnt3a
+    - pathway: BMP inhibition
+      compounds:
+      - Noggin
+      - LDN-193189
+    - pathway: EGFR signaling
+      compounds:
+      - EGF
+    - pathway: YAP/TAZ signaling
+      compounds: []
+  gut/x_cells:
+    tissue: Gut
+    cell_type: X cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - IWP2
+      - IWR-1
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1
+    - pathway: Nutrient signaling
+      compounds:
+      - fatty acids
+      - glucose modulation
+      - octanoate
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+  human_islets/acinar_cells:
+    tissue: Human islets
+    cell_type: Acinar cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: BMP inhibition
+      compounds:
+      - Dosomorphin
+      - LDN-193189
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2 (late)
+      - IWR-1 (late)
+    - pathway: FGF signaling
+      compounds:
+      - FGF10
+      - FGF7
+    - pathway: Retinoic Acid signaling
+      compounds:
+      - Retinoic acid
+      - BMS493
+  human_islets/alpha_cells:
+    tissue: Human islets
+    cell_type: Alpha cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Tgfb/Activin/Nodal signaling
+      compounds:
+      - Activin A (early)
+      - SB431542 (late)
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2
+      - IWR-1 (late)
+    - pathway: Retinoic Acid signaling
+      compounds:
+      - Retinoic acid
+      - BMS493
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: Hedgehog inhibition
+      compounds:
+      - Cyclopamine
+    - pathway: BMP inhibition
+      compounds:
+      - Dosomorphin
+      - LDN-193189
+  human_islets/beta_cells:
+    tissue: Human islets
+    cell_type: Beta cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Tgfb/Activin/Nodal signaling
+      compounds:
+      - Activin A (early) SB431542
+      - A83-01 (late)
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2 (late)
+      - IWR-1 (late)
+    - pathway: Retinoic Acid signaling
+      compounds:
+      - Retinoic acid
+      - BMS493
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: Thyroid hormone signaling
+      compounds:
+      - T3 (triiodothyronine)
+    - pathway: PI3K, AKT, mTOR signaling
+      compounds:
+      - IGF-1
+      - Insulin
+      - Rapamycin
+    - pathway: PPAR signaling
+      compounds:
+      - Rosiglitazone
+    - pathway: Glucocorticoid signaling
+      compounds:
+      - Dexamethasone
+    - pathway: Hedgehog inhibition
+      compounds:
+      - Cyclopamine
+      - SANT1
+    - pathway: BMP inhibition
+      compounds:
+      - Dosomorphin
+      - LDN-193189
+  human_islets/delta_cells:
+    tissue: Human islets
+    cell_type: Delta cells
+    pathway_chemicals:
+    - pathway: Notch inhibition
+      compounds:
+      - DAPT
+      - Dibenzazepine
+    - pathway: Tgfb/Activin/Nodal signaling
+      compounds:
+      - Activin A (early) SB431542
+      - A83-01 (late)
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2 (late)
+      - IWR-1 (late)
+    - pathway: BMP inhibition
+      compounds:
+      - Dosomorphin
+      - LDN-193189
+    - pathway: PI3K, AKT signaling
+      compounds:
+      - IGF-1
+      - Insulin
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: Hedgehog inhibition
+      compounds:
+      - Cyclopamine
+  human_islets/ductal_cells:
+    tissue: Human islets
+    cell_type: Ductal cells
+    pathway_chemicals:
+    - pathway: Notch activation
+      compounds:
+      - Jagged1/DLL4 ligands
+    - pathway: BMP activation
+      compounds:
+      - BMP4
+    - pathway: TGF-beta signaling
+      compounds:
+      - TGF-β1 / TGF-β2 ligands
+    - pathway: Wnt/beta-catenin signaling
+      compounds:
+      - CHIR99021 (early)
+      - IWP2 (late)
+      - IWR-1 (late)
+    - pathway: Retinoic Acid signaling
+      compounds:
+      - Retinoic acid
+      - BMS493
+  human_islets/enterochromaffin_cells:
+    tissue: Human islets
+    cell_type: Enterochromaffin cells
+    pathway_chemicals:
+    - pathway: Prolactin / JAK-STAT signaling
+      compounds:
+      - Prolactin
+      - Placental lactogen
+    - pathway: Tryptophan metabolism
+      compounds:
+      - tryptophan supplementation
+      - BH4
+    - pathway: cAMP/PKA activation
+      compounds:
+      - forskolin
+      - IBMX
+    - pathway: mTOR signaling
+      compounds:
+      - Glucose
+      - insulin signaling
